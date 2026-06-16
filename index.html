@@ -1612,16 +1612,25 @@ async function handleLogin() {
   btn.disabled = true;
   btn.textContent = 'Logger inn...';
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  btn.disabled = false;
-  btn.textContent = 'Logg inn';
-
-  if (error) {
-    const msg = error.message?.toLowerCase().includes('email') || error.message?.toLowerCase().includes('confirm')
-      ? 'E-posten er ikke bekreftet ennå. Sjekk innboksen din og klikk bekreftelseslenken.'
-      : 'Feil e-post eller passord.';
-    showAuthError('login', msg);
+  const resetBtn = () => { btn.disabled = false; btn.textContent = 'Logg inn'; };
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
+  try {
+    const { error } = await Promise.race([
+      supabase.auth.signInWithPassword({ email, password }),
+      timeout
+    ]);
+    resetBtn();
+    if (error) {
+      const msg = error.message?.toLowerCase().includes('email') || error.message?.toLowerCase().includes('confirm')
+        ? 'E-posten er ikke bekreftet ennå. Sjekk innboksen din og klikk bekreftelseslenken.'
+        : 'Feil e-post eller passord.';
+      showAuthError('login', msg);
+    }
+  } catch(e) {
+    resetBtn();
+    showAuthError('login', e.message === 'timeout'
+      ? 'Tidsavbrudd — sjekk internettforbindelsen eller prøv i privat nettleser-modus.'
+      : 'Nettverksfeil. Prøv igjen.');
   }
 }
 
