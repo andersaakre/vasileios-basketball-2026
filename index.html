@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Basketball Summer Program 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.min.js" onload="initSupabase()" onerror="supabaseFailed()"></script>
 <style>
   :root {
     --orange: #F5821F;
@@ -1294,24 +1294,72 @@
 */
 
 // ===== SUPABASE INIT =====
-// Fallback: always show auth after 3s, regardless of any JS errors
-setTimeout(() => {
-  const ls = document.getElementById('loading-screen');
-  if (ls && !ls.classList.contains('hidden')) {
-    ls.classList.add('hidden');
-    try { showAuthScreen(); } catch(e) { ls.style.display = 'none'; document.getElementById('view-auth').style.display = 'flex'; }
-  }
-}, 3000);
+let supabase = null;
 
-let supabase;
-try {
-  const SUPABASE_URL = 'https://aycninonwmnctqwdsutz.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_LSyFkDuIpKL-LZE6IS0ziw_CcngFfzI';
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} catch(e) {
-  console.error('Supabase init failed:', e);
-  document.getElementById('loading-screen').classList.add('hidden');
-  document.getElementById('view-auth').style.display = 'flex';
+// Fallback: if Supabase CDN never loads (e.g. network block), show auth after 6s
+const _cdnFallback = setTimeout(() => {
+  if (!supabase) subaseFailed();
+}, 6000);
+
+function subaseFailed() {
+  clearTimeout(_cdnFallback);
+  const ls = document.getElementById('loading-screen');
+  if (ls) ls.classList.add('hidden');
+  try { showAuthScreen(); } catch(e) {
+    if (ls) ls.style.display = 'none';
+    document.getElementById('view-auth').style.display = 'flex';
+  }
+}
+
+function initSupabase() {
+  clearTimeout(_cdnFallback);
+  try {
+    const SUPABASE_URL = 'https://aycninonwmnctqwdsutz.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_LSyFkDuIpKL-LZE6IS0ziw_CcngFfzI';
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch(e) {
+    console.error('Supabase init failed:', e);
+    subaseFailed();
+    return;
+  }
+
+  // Fallback if onAuthStateChange never fires within 4s of init
+  const _authFallback = setTimeout(() => {
+    const ls = document.getElementById('loading-screen');
+    if (ls && !ls.classList.contains('hidden')) subaseFailed();
+  }, 4000);
+
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    clearTimeout(_authFallback);
+    document.getElementById('loading-screen').classList.add('hidden');
+
+    if (session?.user) {
+      currentUser = session.user;
+
+      let { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (!profile) {
+        const pendingName = sessionStorage.getItem('pending_profile_name') || currentUser.email.split('@')[0];
+        sessionStorage.removeItem('pending_profile_name');
+        await supabase.from('profiles').insert({ id: currentUser.id, name: pendingName });
+        const { data: newProfile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+        profile = newProfile;
+      }
+
+      userProfile = profile;
+      await loadProgress();
+      showApp();
+    } else {
+      currentUser = null;
+      userProfile = null;
+      progressCache = {};
+      showAuthScreen();
+    }
+  });
 }
 
 let currentUser = null;
@@ -1703,38 +1751,7 @@ function showAuthScreen() {
   document.getElementById('app-wrapper').style.display = 'none';
 }
 
-// ===== AUTH STATE HANDLER =====
-supabase.auth.onAuthStateChange(async (event, session) => {
-  document.getElementById('loading-screen').classList.add('hidden');
-
-  if (session?.user) {
-    currentUser = session.user;
-
-    let { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', currentUser.id)
-      .single();
-
-    // If no profile yet, create it (handles post-signup flow)
-    if (!profile) {
-      const pendingName = sessionStorage.getItem('pending_profile_name') || currentUser.email.split('@')[0];
-      sessionStorage.removeItem('pending_profile_name');
-      await supabase.from('profiles').insert({ id: currentUser.id, name: pendingName });
-      const { data: newProfile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-      profile = newProfile;
-    }
-
-    userProfile = profile;
-    await loadProgress();
-    showApp();
-  } else {
-    currentUser = null;
-    userProfile = null;
-    progressCache = {};
-    showAuthScreen();
-  }
-});
+// Auth state handler is registered inside initSupabase() above
 
 // ===== DATE HELPERS =====
 function todayStr() {
