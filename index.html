@@ -1600,16 +1600,20 @@ async function handleLogin() {
   btn.disabled = true;
   btn.textContent = 'Logger inn...';
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  btn.disabled = false;
-  btn.textContent = 'Logg inn';
-
-  if (error) {
-    const msg = error.message?.toLowerCase().includes('email') || error.message?.toLowerCase().includes('confirm')
-      ? 'E-posten er ikke bekreftet ennå. Sjekk innboksen din og klikk bekreftelseslenken.'
-      : 'Feil e-post eller passord.';
-    showAuthError('login', msg);
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    btn.disabled = false;
+    btn.textContent = 'Logg inn';
+    if (error) {
+      const msg = error.message?.toLowerCase().includes('email') || error.message?.toLowerCase().includes('confirm')
+        ? 'E-posten er ikke bekreftet ennå. Sjekk innboksen din og klikk bekreftelseslenken.'
+        : 'Feil e-post eller passord.';
+      showAuthError('login', msg);
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Logg inn';
+    showAuthError('login', 'Nettverksfeil. Sjekk internettforbindelsen og prøv igjen.');
   }
 }
 
@@ -1635,7 +1639,16 @@ async function handleRegister() {
   // Store name so onAuthStateChange can create the profile after session is ready
   sessionStorage.setItem('pending_profile_name', name);
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  let data, error;
+  try {
+    ({ data, error } = await supabase.auth.signUp({ email, password }));
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Lag konto';
+    sessionStorage.removeItem('pending_profile_name');
+    showAuthError('register', 'Nettverksfeil. Sjekk internettforbindelsen og prøv igjen.');
+    return;
+  }
 
   if (error) {
     btn.disabled = false;
