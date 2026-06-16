@@ -1315,10 +1315,10 @@ setTimeout(() => {
   }
 }, 3000);
 
+const SUPABASE_URL = 'https://aycninonwmnctqwdsutz.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_LSyFkDuIpKL-LZE6IS0ziw_CcngFfzI';
 let supabase;
 try {
-  const SUPABASE_URL = 'https://aycninonwmnctqwdsutz.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_LSyFkDuIpKL-LZE6IS0ziw_CcngFfzI';
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } catch(e) {
   console.error('Supabase init failed:', e);
@@ -1613,23 +1613,39 @@ async function handleLogin() {
   btn.textContent = 'Logger inn...';
 
   const resetBtn = () => { btn.disabled = false; btn.textContent = 'Logg inn'; };
-  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
+
   try {
-    const { error } = await Promise.race([
-      supabase.auth.signInWithPassword({ email, password }),
-      timeout
-    ]);
-    resetBtn();
-    if (error) {
-      const msg = error.message?.toLowerCase().includes('email') || error.message?.toLowerCase().includes('confirm')
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
+    const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    clearTimeout(timer);
+    const body = await res.json();
+
+    if (!res.ok) {
+      resetBtn();
+      const m = (body.error_description || body.msg || body.error || '').toLowerCase();
+      const msg = m.includes('confirm') || m.includes('email_not_confirmed')
         ? 'E-posten er ikke bekreftet ennå. Sjekk innboksen din og klikk bekreftelseslenken.'
         : 'Feil e-post eller passord.';
       showAuthError('login', msg);
+      return;
     }
+
+    // Hand the session to supabase-js so all subsequent calls use it
+    await supabase.auth.setSession({
+      access_token: body.access_token,
+      refresh_token: body.refresh_token
+    });
+    // onAuthStateChange will fire from setSession and route to showApp()
   } catch(e) {
     resetBtn();
-    showAuthError('login', e.message === 'timeout'
-      ? 'Tidsavbrudd — sjekk internettforbindelsen eller prøv i privat nettleser-modus.'
+    showAuthError('login', e.name === 'AbortError'
+      ? 'Tidsavbrudd — sjekk internettforbindelsen og prøv igjen.'
       : 'Nettverksfeil. Prøv igjen.');
   }
 }
@@ -1652,25 +1668,51 @@ async function handleRegister() {
   const btn = document.querySelector('#auth-form-register .auth-btn');
   btn.disabled = true;
   btn.textContent = 'Lager konto...';
+  const resetBtn = () => { btn.disabled = false; btn.textContent = 'Lag konto'; };
 
   // Store name so onAuthStateChange can create the profile after session is ready
   sessionStorage.setItem('pending_profile_name', name);
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
-
-  if (error) {
-    btn.disabled = false;
-    btn.textContent = 'Lag konto';
+  let body;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
+    const res = await fetch(SUPABASE_URL + '/auth/v1/signup', {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    clearTimeout(timer);
+    body = await res.json();
+    if (!res.ok) {
+      resetBtn();
+      sessionStorage.removeItem('pending_profile_name');
+      showAuthError('register', body.msg || body.error_description || body.error || 'Noe gikk galt. Prøv igjen.');
+      return;
+    }
+  } catch(e) {
+    resetBtn();
     sessionStorage.removeItem('pending_profile_name');
-    showAuthError('register', error.message || 'Noe gikk galt. Prøv igjen.');
+    showAuthError('register', e.name === 'AbortError'
+      ? 'Tidsavbrudd — sjekk internettforbindelsen og prøv igjen.'
+      : 'Nettverksfeil. Prøv igjen.');
     return;
   }
 
-  btn.disabled = false;
-  btn.textContent = 'Lag konto';
+  resetBtn();
 
-  // If no session returned, email confirmation is required
-  if (!data.session) {
+  // If session was returned (email confirmation off), hand it to supabase-js
+  if (body.access_token && body.refresh_token) {
+    await supabase.auth.setSession({
+      access_token: body.access_token,
+      refresh_token: body.refresh_token
+    });
+    return;
+  }
+
+  // No session = email confirmation required
+  {
     const errorEl = document.getElementById('register-error');
     errorEl.textContent = '✅ Konto opprettet! Sjekk e-posten din og klikk bekreftelseslenken for å logge inn.';
     errorEl.style.background = 'rgba(22,163,74,0.15)';
