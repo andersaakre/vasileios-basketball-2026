@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Basketball Summer Program 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.min.js" onload="initSupabase()" onerror="supabaseFailed()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.min.js"></script>
 <style>
   :root {
     --orange: #F5821F;
@@ -1296,13 +1296,7 @@
 // ===== SUPABASE INIT =====
 let supabase = null;
 
-// Fallback: if Supabase CDN never loads (e.g. network block), show auth after 6s
-const _cdnFallback = setTimeout(() => {
-  if (!supabase) subaseFailed();
-}, 6000);
-
-function subaseFailed() {
-  clearTimeout(_cdnFallback);
+function supabaseFailed() {
   const ls = document.getElementById('loading-screen');
   if (ls) ls.classList.add('hidden');
   try { showAuthScreen(); } catch(e) {
@@ -1311,22 +1305,27 @@ function subaseFailed() {
   }
 }
 
+// Fallback: if anything goes wrong, show auth after 5s
+setTimeout(() => {
+  const ls = document.getElementById('loading-screen');
+  if (ls && !ls.classList.contains('hidden')) supabaseFailed();
+}, 5000);
+
 function initSupabase() {
-  clearTimeout(_cdnFallback);
   try {
     const SUPABASE_URL = 'https://aycninonwmnctqwdsutz.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_LSyFkDuIpKL-LZE6IS0ziw_CcngFfzI';
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch(e) {
     console.error('Supabase init failed:', e);
-    subaseFailed();
+    supabaseFailed();
     return;
   }
 
   // Fallback if onAuthStateChange never fires within 4s of init
   const _authFallback = setTimeout(() => {
     const ls = document.getElementById('loading-screen');
-    if (ls && !ls.classList.contains('hidden')) subaseFailed();
+    if (ls && !ls.classList.contains('hidden')) supabaseFailed();
   }, 4000);
 
   supabase.auth.onAuthStateChange(async (event, session) => {
@@ -1775,7 +1774,8 @@ function showAuthScreen() {
   document.getElementById('app-wrapper').style.display = 'none';
 }
 
-// Auth state handler is registered inside initSupabase() above
+// Auth state handler is registered inside initSupabase()
+initSupabase();
 
 // ===== DATE HELPERS =====
 function todayStr() {
