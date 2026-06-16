@@ -1276,9 +1276,25 @@
 */
 
 // ===== SUPABASE INIT =====
-const SUPABASE_URL = 'https://aycninonwmnctqwdsutz.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_LSyFkDuIpKL-LZE6IS0ziw_CcngFfzI';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Fallback: always show auth after 3s, regardless of any JS errors
+setTimeout(() => {
+  const ls = document.getElementById('loading-screen');
+  if (ls && !ls.classList.contains('hidden')) {
+    ls.classList.add('hidden');
+    try { showAuthScreen(); } catch(e) { ls.style.display = 'none'; document.getElementById('view-auth').style.display = 'flex'; }
+  }
+}, 3000);
+
+let supabase;
+try {
+  const SUPABASE_URL = 'https://aycninonwmnctqwdsutz.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_LSyFkDuIpKL-LZE6IS0ziw_CcngFfzI';
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch(e) {
+  console.error('Supabase init failed:', e);
+  document.getElementById('loading-screen').classList.add('hidden');
+  document.getElementById('view-auth').style.display = 'flex';
+}
 
 let currentUser = null;
 let userProfile = null;
@@ -1651,15 +1667,6 @@ function showAuthScreen() {
 }
 
 // ===== AUTH STATE HANDLER =====
-// Fallback: if Supabase never fires, show auth after 4s
-setTimeout(() => {
-  const ls = document.getElementById('loading-screen');
-  if (ls && !ls.classList.contains('hidden')) {
-    ls.classList.add('hidden');
-    showAuthScreen();
-  }
-}, 4000);
-
 supabase.auth.onAuthStateChange(async (event, session) => {
   document.getElementById('loading-screen').classList.add('hidden');
 
