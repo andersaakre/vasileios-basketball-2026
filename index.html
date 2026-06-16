@@ -1531,7 +1531,10 @@ async function handleLogin() {
   btn.textContent = 'Logg inn';
 
   if (error) {
-    showAuthError('login', 'Feil e-post eller passord.');
+    const msg = error.message?.toLowerCase().includes('email') || error.message?.toLowerCase().includes('confirm')
+      ? 'E-posten er ikke bekreftet ennå. Sjekk innboksen din og klikk bekreftelseslenken.'
+      : 'Feil e-post eller passord.';
+    showAuthError('login', msg);
   }
 }
 
@@ -1567,9 +1570,23 @@ async function handleRegister() {
     return;
   }
 
-  // onAuthStateChange will fire and handle profile creation + showApp
   btn.disabled = false;
   btn.textContent = 'Lag konto';
+
+  // If no session returned, email confirmation is required
+  if (!data.session) {
+    const errorEl = document.getElementById('register-error');
+    errorEl.textContent = '✅ Konto opprettet! Sjekk e-posten din og klikk bekreftelseslenken for å logge inn.';
+    errorEl.style.background = 'rgba(22,163,74,0.15)';
+    errorEl.style.borderColor = '#16a34a';
+    errorEl.style.color = '#4ade80';
+    errorEl.classList.add('show');
+    // Clear the form
+    document.getElementById('register-name').value = '';
+    document.getElementById('register-email').value = '';
+    document.getElementById('register-password').value = '';
+  }
+  // If session exists (email confirm off), onAuthStateChange handles the rest
 }
 
 async function logout() {
