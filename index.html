@@ -613,6 +613,24 @@
     font-style: italic;
   }
 
+  /* YOUTUBE LINK */
+  .yt-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #FF0000;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 8px;
+    text-decoration: none;
+    margin-left: 6px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  .yt-link:hover { background: #cc0000; }
+
   /* REST DAY */
   .rest-day {
     text-align: center;
@@ -1363,110 +1381,110 @@ const EXERCISES = {
   'WARM UP 1': {
     desc: 'General activation warm-up focusing on mobility, joint preparation, and movement readiness.',
     exercises: [
-      {id:'A1', name:'Skips', sets:1, reps:'20 sec'},
-      {id:'B1', name:'Seal Jack', sets:1, reps:'20 sec'},
-      {id:'C1', name:'Over-Under Hamstring Lean', sets:1, reps:'5 rep/leg'},
-      {id:'D1', name:'Quad/Hamstring Lean', sets:1, reps:'5 rep/leg'},
-      {id:'E1', name:'Hip Opener', sets:1, reps:'5 rep/leg'},
-      {id:'F1', name:'Adductor/Hip Flexor Combo', sets:1, reps:'6 rep/leg'},
-      {id:'G1', name:'Overhead Deep Squat Progression', sets:1, reps:'5 rep/leg'},
-      {id:'H1', name:'Hip Bridge', sets:1, reps:'30 sec'},
+      {id:'A1', name:'Skips', sets:1, reps:'20 sec', youtube:'https://youtu.be/dsBwqf1t1AU?t=4'},
+      {id:'B1', name:'Seal Jack', sets:1, reps:'20 sec', youtube:'https://youtu.be/dsBwqf1t1AU?t=32'},
+      {id:'C1', name:'Over-Under Hamstring Lean', sets:1, reps:'5 rep/leg', youtube:'https://youtu.be/dsBwqf1t1AU?t=59'},
+      {id:'D1', name:'Quad/Hamstring Lean', sets:1, reps:'5 rep/leg', youtube:'https://youtu.be/dsBwqf1t1AU?t=91'},
+      {id:'E1', name:'Hip Opener', sets:1, reps:'5 rep/leg', youtube:'https://youtu.be/dsBwqf1t1AU?t=132'},
+      {id:'F1', name:'Adductor/Hip Flexor Combo', sets:1, reps:'6 rep/leg', youtube:'https://youtu.be/dsBwqf1t1AU?t=162'},
+      {id:'G1', name:'Overhead Deep Squat Progression', sets:1, reps:'5 rep/leg', youtube:'https://youtu.be/dsBwqf1t1AU?t=229'},
+      {id:'H1', name:'Hip Bridge', sets:1, reps:'30 sec', youtube:'https://youtu.be/dsBwqf1t1AU?t=306'},
     ]
   },
   'WARM UP 2': {
     desc: 'Dynamic warm-up with increased volume — activates ankles, hips, and lateral movement patterns.',
     exercises: [
-      {id:'A1', name:'Skips', sets:1, reps:'30 sec'},
-      {id:'B1', name:'Seal Jack', sets:1, reps:'30 sec'},
-      {id:'C1', name:'Quad Stretch', sets:1, reps:'8 rep/leg'},
-      {id:'D1', name:'Lunge with Tuck', sets:1, reps:'8 rep/leg'},
-      {id:'E1', name:'Lat Rotations', sets:1, reps:'10 rep/side'},
-      {id:'F1', name:'Straight Leg Skips', sets:1, reps:'10 rep/leg'},
-      {id:'G1', name:'Quadruped Kicks', sets:1, reps:'10 rep/leg'},
-      {id:'H1', name:'Ankle Alphabet Drill', sets:1, reps:'1 Alphabet/leg'},
+      {id:'A1', name:'Skips', sets:1, reps:'30 sec', youtube:'https://youtu.be/dsBwqf1t1AU?t=4'},
+      {id:'B1', name:'Seal Jack', sets:1, reps:'30 sec', youtube:'https://youtu.be/dsBwqf1t1AU?t=32'},
+      {id:'C1', name:'Quad Stretch', sets:1, reps:'8 rep/leg', youtube:'https://www.youtube.com/watch?v=yGN2Z6XkWNQ'},
+      {id:'D1', name:'Lunge with Tuck', sets:1, reps:'8 rep/leg', youtube:'https://youtu.be/3VGpBWduQlc?t=8'},
+      {id:'E1', name:'Lat Rotations', sets:1, reps:'10 rep/side', youtube:'https://www.youtube.com/watch?v=6sO_yUqRBM8'},
+      {id:'F1', name:'Straight Leg Skips', sets:1, reps:'10 rep/leg', youtube:'https://youtu.be/v1jBQ98GYdI?t=35'},
+      {id:'G1', name:'Quadruped Kicks', sets:1, reps:'10 rep/leg', youtube:'https://youtu.be/LvxKlmfqAQ8?t=235'},
+      {id:'H1', name:'Ankle Alphabet Drill', sets:1, reps:'1 Alphabet/leg', youtube:'https://www.youtube.com/watch?v=vHMJ0zgrsFU'},
     ]
   },
   'FMS': {
     desc: 'Fundamental Movement Skills — build the athletic foundation: jumping, landing, balance, and bodyweight control.',
     exercises: [
-      {id:'A1', name:'Toe-Off 2-Leg Squat Jump & Stick', sets:2, reps:'8 rep', rest:'30 sec'},
-      {id:'B1', name:'Skater Hops (Lateral Bounds)', sets:2, reps:'10 rep', rest:'30 sec'},
-      {id:'B2', name:'Bear Crawl Forward & Backward', sets:2, reps:'30 sec', rest:'30 sec'},
-      {id:'C1', name:'Single Leg Balance Hold (Eyes Open/Closed)', sets:3, reps:'20 sec/leg', rest:'0 sec'},
-      {id:'C2', name:'Bilateral Hip Bridge Hold', sets:3, reps:'20 sec', rest:'30 sec'},
-      {id:'D1', name:'Bodyweight Squat (Slow Tempo 3-1-3)', sets:2, reps:'8 rep', rest:'30 sec'},
-      {id:'D2', name:'Push Up on Knees (3 sec down)', sets:2, reps:'8 rep', rest:'30 sec'},
-      {id:'E1', name:'Inchworm Walkout', sets:2, reps:'8 rep', rest:'30 sec'},
-      {id:'F1', name:'Split Stance Hold (Static Lunge)', sets:2, reps:'20 sec/leg', rest:'30 sec'},
+      {id:'A1', name:'Toe-Off 2-Leg Squat Jump & Stick', sets:2, reps:'8 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=A-cFYWvaHr0'},
+      {id:'B1', name:'Skater Hops (Lateral Bounds)', sets:2, reps:'10 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=9_jLW6VkU8A'},
+      {id:'B2', name:'Bear Crawl Forward & Backward', sets:2, reps:'30 sec', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=b59nf1no1JQ'},
+      {id:'C1', name:'Single Leg Balance Hold (Eyes Open/Closed)', sets:3, reps:'20 sec/leg', rest:'0 sec', youtube:'https://www.youtube.com/watch?v=4HtOeds_vyw'},
+      {id:'C2', name:'Bilateral Hip Bridge Hold', sets:3, reps:'20 sec', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=1dlSeEMe5yM'},
+      {id:'D1', name:'Bodyweight Squat (Slow Tempo 3-1-3)', sets:2, reps:'8 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=HjKa7I_maY8'},
+      {id:'D2', name:'Push Up on Knees (3 sec down)', sets:2, reps:'8 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=jWxvty2KROs'},
+      {id:'E1', name:'Inchworm Walkout', sets:2, reps:'8 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=XIV9u6391yQ'},
+      {id:'F1', name:'Split Stance Hold (Static Lunge)', sets:2, reps:'20 sec/leg', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=dCThPoz3WVk'},
     ]
   },
   'CORE': {
     desc: 'Core & Coordination — strengthen the trunk, improve posture, and develop body control for athletic movement.',
     exercises: [
-      {id:'A1', name:'Dead Bug (Arm-Leg Extension)', sets:2, reps:'10 rep', rest:'30 sec'},
-      {id:'B1', name:'Bird Dog', sets:2, reps:'10 rep', rest:'30 sec'},
-      {id:'B2', name:'Side Plank Hold (Knee Mod.)', sets:2, reps:'20 sec/side', rest:'30 sec'},
-      {id:'C1', name:'Glute Bridge with March', sets:2, reps:'12 rep', rest:'30 sec'},
-      {id:'C2', name:'Superman Hold', sets:2, reps:'5 rep x 5 sec', rest:'30 sec'},
-      {id:'D1', name:'Plank Hold (Knee or Full)', sets:2, reps:'20 sec', rest:'30 sec'},
-      {id:'D2', name:'Crab Walk', sets:2, reps:'20 sec', rest:'20 sec'},
-      {id:'E1', name:'Reverse Snow Angel (Prone)', sets:2, reps:'10 rep', rest:'20 sec'},
-      {id:'F1', name:'Hollow Body Hold (Beginner)', sets:2, reps:'20 sec', rest:'30 sec'},
+      {id:'A1', name:'Dead Bug (Arm-Leg Extension)', sets:2, reps:'10 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=GbSC02oU3To'},
+      {id:'B1', name:'Bird Dog', sets:2, reps:'10 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=xEDnlOxeJH4'},
+      {id:'B2', name:'Side Plank Hold (Knee Mod.)', sets:2, reps:'20 sec/side', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=ribtncUfriU'},
+      {id:'C1', name:'Glute Bridge with March', sets:2, reps:'12 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=rXAbcneAr3I'},
+      {id:'C2', name:'Superman Hold', sets:2, reps:'5 rep x 5 sec', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=LZoWdePF1NQ'},
+      {id:'D1', name:'Plank Hold (Knee or Full)', sets:2, reps:'20 sec', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=u6ZelKyUM6g'},
+      {id:'D2', name:'Crab Walk', sets:2, reps:'20 sec', rest:'20 sec', youtube:'https://www.youtube.com/watch?v=4JuKZA2jT6Y'},
+      {id:'E1', name:'Reverse Snow Angel (Prone)', sets:2, reps:'10 rep', rest:'20 sec', youtube:'https://www.youtube.com/watch?v=0qLP2RNKX4A'},
+      {id:'F1', name:'Hollow Body Hold (Beginner)', sets:2, reps:'20 sec', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=jLxtFNO0r50'},
     ]
   },
   'UB': {
     desc: 'Upper Body 1×20 — high-rep, light resistance work for shoulder health, arm strength, and pushing mechanics.',
     exercises: [
-      {id:'A1', name:'Wall Push Ups (Slow Control)', sets:1, reps:'20 rep', rest:'60 sec'},
-      {id:'B1', name:'Prone Y-T-W Raises (No Weight)', sets:1, reps:'20 rep each', rest:'60 sec'},
-      {id:'C1', name:'Band Pull-Aparts (Light Band)', sets:1, reps:'20 rep', rest:'60 sec'},
-      {id:'D1', name:'Shoulder Circles & Arm Swings', sets:1, reps:'20 rep/direction', rest:'60 sec'},
-      {id:'E1', name:'Push Up on Knees (Full Range)', sets:1, reps:'20 rep', rest:'60 sec'},
-      {id:'F1', name:'Prone Swimmers (No Weight)', sets:1, reps:'20 rep', rest:'60 sec'},
-      {id:'G1', name:'Bicep Curl with Light Band', sets:1, reps:'20 rep/arm', rest:'60 sec'},
-      {id:'H1', name:'Tricep Push Down (Band – Standing)', sets:1, reps:'20 rep', rest:'60 sec'},
-      {id:'I1', name:'Half-Kneeling Single Arm Press (Band)', sets:1, reps:'20 rep/arm', rest:'60 sec'},
+      {id:'A1', name:'Wall Push Ups (Slow Control)', sets:1, reps:'20 rep', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=EOf3cGIQpA4'},
+      {id:'B1', name:'Prone Y-T-W Raises (No Weight)', sets:1, reps:'20 rep each', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=CFt3WjCBbpc'},
+      {id:'C1', name:'Band Pull-Aparts (Light Band)', sets:1, reps:'20 rep', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=bYsgk9SrJ48'},
+      {id:'D1', name:'Shoulder Circles & Arm Swings', sets:1, reps:'20 rep/direction', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=ndmSvkEdNQQ'},
+      {id:'E1', name:'Push Up on Knees (Full Range)', sets:1, reps:'20 rep', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=jWxvty2KROs'},
+      {id:'F1', name:'Prone Swimmers (No Weight)', sets:1, reps:'20 rep', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=IaQfd6OzGIQ'},
+      {id:'G1', name:'Bicep Curl with Light Band', sets:1, reps:'20 rep/arm', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=0hZboUNuogA'},
+      {id:'H1', name:'Tricep Push Down (Band – Standing)', sets:1, reps:'20 rep', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=rdEIMo7EKyA'},
+      {id:'I1', name:'Half-Kneeling Single Arm Press (Band)', sets:1, reps:'20 rep/arm', rest:'60 sec', youtube:'https://www.youtube.com/watch?v=TEc27KAq8jI'},
     ]
   },
   'RD': {
     desc: 'Coordination & Rhythm Drills — sharpen hand-eye coordination, footwork, and multi-directional agility.',
     exercises: [
-      {id:'A1', name:'2 Ball Toss & Catch (Wall Bounce)', sets:3, reps:'30 sec', rest:'15 sec'},
-      {id:'B1', name:'Agility Ladder – Forward In,In,Out,Out', sets:3, reps:'2 lengths', rest:'30 sec'},
-      {id:'B2', name:'Agility Ladder – Lateral In,In,Out,Out', sets:3, reps:'2 lengths', rest:'30 sec'},
-      {id:'C1', name:'Cone Weave (Dribble / No Ball)', sets:3, reps:'3 lengths', rest:'30 sec'},
-      {id:'C2', name:'Jump Rope Basics (Two Feet)', sets:3, reps:'30 sec', rest:'30 sec'},
-      {id:'D1', name:'Lateral Shuffle (Cone to Cone)', sets:3, reps:'30 sec', rest:'30 sec'},
-      {id:'D2', name:'Mirror Drill with Partner', sets:3, reps:'20 sec/set', rest:'20 sec'},
-      {id:'E1', name:'One Foot Jumps (Over & Back)', sets:2, reps:'15 sec/leg', rest:'20 sec'},
-      {id:'F1', name:'Balance Beam Walk (Line on Floor)', sets:2, reps:'3 lengths', rest:'15 sec'},
+      {id:'A1', name:'2 Ball Toss & Catch (Wall Bounce)', sets:3, reps:'30 sec', rest:'15 sec', youtube:'https://www.youtube.com/watch?v=4M9qk3JEg9c'},
+      {id:'B1', name:'Agility Ladder – Forward In,In,Out,Out', sets:3, reps:'2 lengths', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=J4OBZpAZgxw'},
+      {id:'B2', name:'Agility Ladder – Lateral In,In,Out,Out', sets:3, reps:'2 lengths', rest:'30 sec', youtube:'https://youtu.be/4WJhhSJCg9Q?t=22'},
+      {id:'C1', name:'Cone Weave (Dribble / No Ball)', sets:3, reps:'3 lengths', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=EvqQIfXrCSs'},
+      {id:'C2', name:'Jump Rope Basics (Two Feet)', sets:3, reps:'30 sec', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=5TA__nPWNtA'},
+      {id:'D1', name:'Lateral Shuffle (Cone to Cone)', sets:3, reps:'30 sec', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=N5dT5DDst_g'},
+      {id:'D2', name:'Mirror Drill with Partner', sets:3, reps:'20 sec/set', rest:'20 sec', youtube:'https://www.youtube.com/watch?v=Pb15pCX16H8'},
+      {id:'E1', name:'One Foot Jumps (Over & Back)', sets:2, reps:'15 sec/leg', rest:'20 sec', youtube:'https://youtu.be/k5n6p-MRwF0?t=82'},
+      {id:'F1', name:'Balance Beam Walk (Line on Floor)', sets:2, reps:'3 lengths', rest:'15 sec', youtube:'https://youtu.be/epTaKa5JTW4?t=27'},
     ]
   },
   'JUMP': {
     desc: 'Jumping & Agility — develop explosive power, landing mechanics, and multi-direction jumping ability.',
     exercises: [
-      {id:'A1', name:'Two-Foot Box Jump & Stick (Low Step)', sets:2, reps:'6 Jumps', rest:'45 sec'},
-      {id:'B1', name:'Broad Jumps (Stick Landing)', sets:2, reps:'8 Jumps', rest:'45 sec'},
-      {id:'C1', name:'Pogo Hops Two Feet (Ankle Stiffness)', sets:3, reps:'20 rep', rest:'30 sec'},
-      {id:'D1', name:'Lateral Line Hops (Side to Side)', sets:3, reps:'20 sec', rest:'30 sec'},
-      {id:'E1', name:'Lateral Hurdle Step-Overs (Mini Hurdles)', sets:3, reps:'2 lengths', rest:'30 sec'},
-      {id:'E2', name:'Bunny Hops Forward (Small Cones)', sets:3, reps:'12 Jumps', rest:'30 sec'},
-      {id:'F1', name:'Tuck Jumps (Soft Landing)', sets:2, reps:'8 rep', rest:'45 sec'},
-      {id:'F2', name:'180° Jump & Land (Rotation)', sets:2, reps:'5 rep/side', rest:'45 sec'},
-      {id:'G1', name:'Lateral Single-Leg Jumps (2 Legs Land)', sets:2, reps:'12 rep', rest:'30 sec'},
+      {id:'A1', name:'Two-Foot Box Jump & Stick (Low Step)', sets:2, reps:'6 Jumps', rest:'45 sec', youtube:'https://www.youtube.com/watch?v=k7dmYdknbac'},
+      {id:'B1', name:'Broad Jumps (Stick Landing)', sets:2, reps:'8 Jumps', rest:'45 sec', youtube:'https://www.youtube.com/watch?v=iXad_Bdxixc'},
+      {id:'C1', name:'Pogo Hops Two Feet (Ankle Stiffness)', sets:3, reps:'20 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=iU-TKr4YesM'},
+      {id:'D1', name:'Lateral Line Hops (Side to Side)', sets:3, reps:'20 sec', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=X4wPfeY3QKY'},
+      {id:'E1', name:'Lateral Hurdle Step-Overs (Mini Hurdles)', sets:3, reps:'2 lengths', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=eh8PPMarMg0'},
+      {id:'E2', name:'Bunny Hops Forward (Small Cones)', sets:3, reps:'12 Jumps', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=mIWqcU3mD-4'},
+      {id:'F1', name:'Tuck Jumps (Soft Landing)', sets:2, reps:'8 rep', rest:'45 sec', youtube:'https://www.youtube.com/watch?v=Yl7tEmpzknY'},
+      {id:'F2', name:'180° Jump & Land (Rotation)', sets:2, reps:'5 rep/side', rest:'45 sec', youtube:'https://www.youtube.com/watch?v=e9cHq1RQXwU'},
+      {id:'G1', name:'Lateral Single-Leg Jumps (2 Legs Land)', sets:2, reps:'12 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=kTRzMemmxJk'},
     ]
   },
   'SPEED': {
     desc: 'Speed & Change of Direction — build first-step quickness, acceleration, deceleration, and court awareness.',
     exercises: [
-      {id:'A1', name:'Lateral Shuffle (Cone to Cone)', sets:2, reps:'30 sec', rest:'0 sec'},
-      {id:'A2', name:'T-Drill (Basic Version)', sets:2, reps:'3 rep', rest:'45 sec'},
-      {id:'A3', name:'Shuttle Run (5m-10m)', sets:2, reps:'3 rep', rest:'45 sec'},
-      {id:'B1', name:'Lateral Shuffle (Between Cones)', sets:2, reps:'2 lengths', rest:'30 sec'},
-      {id:'B2', name:'Backpedal to Sprint', sets:2, reps:'5 rep', rest:'30 sec'},
-      {id:'B3', name:'X-Drill', sets:2, reps:'2 rep/side', rest:'45 sec'},
-      {id:'C1', name:'Sprint, Backpedal, Sprint (5-5-10)', sets:2, reps:'5 rep', rest:'30 sec'},
-      {id:'C2', name:'Closeout, Slide to Backpedal Drill', sets:2, reps:'5 rep', rest:'30 sec'},
+      {id:'A1', name:'Lateral Shuffle (Cone to Cone)', sets:2, reps:'30 sec', rest:'0 sec', youtube:'https://www.youtube.com/watch?v=yC7ySshkn9k'},
+      {id:'A2', name:'T-Drill (Basic Version)', sets:2, reps:'3 rep', rest:'45 sec', youtube:'https://www.youtube.com/watch?v=qWWPcfwr-ZQ'},
+      {id:'A3', name:'Shuttle Run (5m-10m)', sets:2, reps:'3 rep', rest:'45 sec', youtube:'https://www.youtube.com/watch?v=fZoJVVuqY3U'},
+      {id:'B1', name:'Lateral Shuffle (Between Cones)', sets:2, reps:'2 lengths', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=omvckxoF9OI'},
+      {id:'B2', name:'Backpedal to Sprint', sets:2, reps:'5 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=efQLNVcbacY'},
+      {id:'B3', name:'X-Drill', sets:2, reps:'2 rep/side', rest:'45 sec', youtube:'https://www.youtube.com/watch?v=2rtZ_uGS9wY'},
+      {id:'C1', name:'Sprint, Backpedal, Sprint (5-5-10)', sets:2, reps:'5 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=t1R2TL8hk2c'},
+      {id:'C2', name:'Closeout, Slide to Backpedal Drill', sets:2, reps:'5 rep', rest:'30 sec', youtube:'https://www.youtube.com/watch?v=aSvFDJcIzys'},
     ]
   }
 };
@@ -2084,7 +2102,12 @@ function renderPrograms() {
             ${prog.exercises.map(e => `
               <tr>
                 <td>${e.id}</td>
-                <td>${e.name}</td>
+                <td>
+                  <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <span>${e.name}</span>
+                    ${e.youtube ? `<a href="${e.youtube}" target="_blank" rel="noopener" class="yt-link" title="Se video">&#9654;</a>` : ''}
+                  </span>
+                </td>
                 <td>${e.sets}</td>
                 <td>${e.reps}</td>
                 ${hasRest ? `<td>${e.rest || '—'}</td>` : ''}
