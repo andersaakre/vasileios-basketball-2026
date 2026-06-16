@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Basketball Summer Program 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.46.2/dist/umd/supabase.min.js"></script>
 <style>
   :root {
     --orange: #F97316;
@@ -1601,6 +1601,15 @@ function showAuthScreen() {
 }
 
 // ===== AUTH STATE HANDLER =====
+// Fallback: if Supabase never fires, show auth after 4s
+setTimeout(() => {
+  const ls = document.getElementById('loading-screen');
+  if (ls && !ls.classList.contains('hidden')) {
+    ls.classList.add('hidden');
+    showAuthScreen();
+  }
+}, 4000);
+
 supabase.auth.onAuthStateChange(async (event, session) => {
   document.getElementById('loading-screen').classList.add('hidden');
 
