@@ -1600,10 +1600,14 @@ async function handleLogin() {
   btn.disabled = true;
   btn.textContent = 'Logger inn...';
 
+  const resetBtn = () => { btn.disabled = false; btn.textContent = 'Logg inn'; };
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
   try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    btn.disabled = false;
-    btn.textContent = 'Logg inn';
+    const { error } = await Promise.race([
+      supabase.auth.signInWithPassword({ email, password }),
+      timeout
+    ]);
+    resetBtn();
     if (error) {
       const msg = error.message?.toLowerCase().includes('email') || error.message?.toLowerCase().includes('confirm')
         ? 'E-posten er ikke bekreftet ennå. Sjekk innboksen din og klikk bekreftelseslenken.'
@@ -1611,9 +1615,11 @@ async function handleLogin() {
       showAuthError('login', msg);
     }
   } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'Logg inn';
-    showAuthError('login', 'Nettverksfeil. Sjekk internettforbindelsen og prøv igjen.');
+    resetBtn();
+    const msg = e.message === 'timeout'
+      ? 'Tidsavbrudd — sjekk internettforbindelsen og prøv igjen.'
+      : 'Nettverksfeil. Sjekk internettforbindelsen og prøv igjen.';
+    showAuthError('login', msg);
   }
 }
 
