@@ -17,7 +17,6 @@
   }
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.46.2/dist/umd/supabase.min.js"></script>
 <style>
   :root {
     --orange: #F5821F;
@@ -1305,25 +1304,42 @@
   create policy "progress_delete" on progress for delete using (auth.uid() = user_id);
 */
 
-// ===== SUPABASE INIT =====
-// Fallback: always show auth after 3s, regardless of any JS errors
-setTimeout(() => {
-  const ls = document.getElementById('loading-screen');
-  if (ls && !ls.classList.contains('hidden')) {
-    ls.classList.add('hidden');
-    try { showAuthScreen(); } catch(e) { ls.style.display = 'none'; document.getElementById('view-auth').style.display = 'flex'; }
-  }
-}, 3000);
-
+// ===== SUPABASE CONFIG (direct REST, no JS library) =====
 const SUPABASE_URL = 'https://aycninonwmnctqwdsutz.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_LSyFkDuIpKL-LZE6IS0ziw_CcngFfzI';
-let supabase;
-try {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} catch(e) {
-  console.error('Supabase init failed:', e);
-  document.getElementById('loading-screen').classList.add('hidden');
-  document.getElementById('view-auth').style.display = 'flex';
+const SESSION_KEY = 'eb85_session_v1';
+
+function getSession() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch(e) { return null; }
+}
+function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+function authHeaders() {
+  const s = getSession();
+  const h = { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
+  if (s?.access_token) h['Authorization'] = 'Bearer ' + s.access_token;
+  return h;
+}
+
+async function dbFetch(path, opts = {}) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1' + path, {
+      ...opts,
+      signal: ctrl.signal,
+      headers: { ...authHeaders(), ...(opts.headers || {}) }
+    });
+    clearTimeout(timer);
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error('DB ' + res.status + ': ' + txt);
+    }
+    if (res.status === 204) return null;
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  } finally { clearTimeout(timer); }
 }
 
 let currentUser = null;
@@ -1549,22 +1565,26 @@ async function setShotsMade(date, val) {
 async function upsertProgress(date) {
   if (!currentUser) return;
   const row = progressCache[date] || {};
-  await supabase.from('progress').upsert({
-    user_id: currentUser.id,
-    date: date,
-    morning_done: row.morning_done || false,
-    evening_done: row.evening_done || false,
-    shots_made: row.shots_made || null,
-  }, { onConflict: 'user_id,date' });
+  try {
+    await dbFetch('/progress?on_conflict=user_id,date', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({
+        user_id: currentUser.id,
+        date: date,
+        morning_done: row.morning_done || false,
+        evening_done: row.evening_done || false,
+        shots_made: row.shots_made || null,
+      })
+    });
+  } catch(e) {
+    console.error('upsertProgress failed:', e);
+  }
 }
 
 async function loadProgress() {
   if (!currentUser) return;
-  const { data } = await supabase
-    .from('progress')
-    .select('*')
-    .eq('user_id', currentUser.id);
-
+  const data = await dbFetch(`/progress?user_id=eq.${currentUser.id}&select=*`);
   progressCache = {};
   if (data) {
     data.forEach(row => {
@@ -1636,12 +1656,13 @@ async function handleLogin() {
       return;
     }
 
-    // Hand the session to supabase-js so all subsequent calls use it
-    await supabase.auth.setSession({
+    saveSession({
       access_token: body.access_token,
-      refresh_token: body.refresh_token
+      refresh_token: body.refresh_token,
+      user: body.user,
+      expires_at: body.expires_at || (Math.floor(Date.now()/1000) + (body.expires_in || 3600))
     });
-    // onAuthStateChange will fire from setSession and route to showApp()
+    await afterLogin();
   } catch(e) {
     resetBtn();
     showAuthError('login', e.name === 'AbortError'
@@ -1702,12 +1723,15 @@ async function handleRegister() {
 
   resetBtn();
 
-  // If session was returned (email confirmation off), hand it to supabase-js
+  // If session was returned (email confirmation off), save it and proceed
   if (body.access_token && body.refresh_token) {
-    await supabase.auth.setSession({
+    saveSession({
       access_token: body.access_token,
-      refresh_token: body.refresh_token
+      refresh_token: body.refresh_token,
+      user: body.user,
+      expires_at: body.expires_at || (Math.floor(Date.now()/1000) + (body.expires_in || 3600))
     });
+    await afterLogin();
     return;
   }
 
@@ -1728,7 +1752,19 @@ async function handleRegister() {
 }
 
 async function logout() {
-  await supabase.auth.signOut();
+  const s = getSession();
+  clearSession();
+  currentUser = null;
+  userProfile = null;
+  progressCache = {};
+  // Best-effort server logout (don't block UI)
+  if (s?.access_token) {
+    fetch(SUPABASE_URL + '/auth/v1/logout', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + s.access_token }
+    }).catch(() => {});
+  }
+  showAuthScreen();
 }
 
 // ===== APP SHELL =====
@@ -1748,37 +1784,47 @@ function showAuthScreen() {
 }
 
 // ===== AUTH STATE HANDLER =====
-supabase.auth.onAuthStateChange(async (event, session) => {
-  document.getElementById('loading-screen').classList.add('hidden');
+async function afterLogin() {
+  const s = getSession();
+  if (!s?.user) { showAuthScreen(); return; }
+  currentUser = s.user;
 
-  if (session?.user) {
-    currentUser = session.user;
+  try {
+    let rows = await dbFetch(`/profiles?id=eq.${currentUser.id}&select=*`);
+    let profile = rows && rows[0];
 
-    let { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', currentUser.id)
-      .single();
-
-    // If no profile yet, create it (handles post-signup flow)
     if (!profile) {
       const pendingName = sessionStorage.getItem('pending_profile_name') || currentUser.email.split('@')[0];
       sessionStorage.removeItem('pending_profile_name');
-      await supabase.from('profiles').insert({ id: currentUser.id, name: pendingName });
-      const { data: newProfile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-      profile = newProfile;
+      await dbFetch('/profiles', {
+        method: 'POST',
+        headers: { 'Prefer': 'return=representation' },
+        body: JSON.stringify({ id: currentUser.id, name: pendingName })
+      });
+      rows = await dbFetch(`/profiles?id=eq.${currentUser.id}&select=*`);
+      profile = rows && rows[0];
     }
 
     userProfile = profile;
     await loadProgress();
     showApp();
-  } else {
-    currentUser = null;
-    userProfile = null;
-    progressCache = {};
+  } catch(e) {
+    console.error('afterLogin failed:', e);
+    // Token likely expired or invalid — clear and show auth
+    clearSession();
     showAuthScreen();
   }
-});
+}
+
+// Initial session check on page load
+(async () => {
+  document.getElementById('loading-screen').classList.add('hidden');
+  if (getSession()) {
+    await afterLogin();
+  } else {
+    showAuthScreen();
+  }
+})();
 
 // ===== DATE HELPERS =====
 function todayStr() {
