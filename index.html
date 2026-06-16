@@ -1649,6 +1649,17 @@ async function handleLogin() {
   btn.textContent = 'Logger inn...';
 
   const resetBtn = () => { btn.disabled = false; btn.textContent = 'Logg inn'; };
+  // Wait for supabase to be ready (up to 8s)
+  let waited = 0;
+  while (!supabase && waited < 8000) {
+    await new Promise(r => setTimeout(r, 100));
+    waited += 100;
+  }
+  if (!supabase) {
+    resetBtn();
+    showAuthError('login', 'Kunne ikke koble til serveren. Last siden på nytt og prøv igjen.');
+    return;
+  }
   const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
   try {
     const { error } = await Promise.race([
@@ -1689,6 +1700,19 @@ async function handleRegister() {
   const btn = document.querySelector('#auth-form-register .auth-btn');
   btn.disabled = true;
   btn.textContent = 'Lager konto...';
+
+  // Wait for supabase to be ready
+  let waited = 0;
+  while (!supabase && waited < 8000) {
+    await new Promise(r => setTimeout(r, 100));
+    waited += 100;
+  }
+  if (!supabase) {
+    btn.disabled = false;
+    btn.textContent = 'Lag konto';
+    showAuthError('register', 'Kunne ikke koble til serveren. Last siden på nytt og prøv igjen.');
+    return;
+  }
 
   // Store name so onAuthStateChange can create the profile after session is ready
   sessionStorage.setItem('pending_profile_name', name);
