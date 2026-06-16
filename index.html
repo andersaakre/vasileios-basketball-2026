@@ -609,19 +609,39 @@
 
   /* MOTIVATIONAL */
   .motivational {
-    background: var(--orange-xlight);
-    border: 1px solid var(--orange-light);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-left: 3px solid var(--orange);
     border-radius: 12px;
-    padding: 16px;
-    text-align: center;
+    padding: 14px 16px;
     margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .motivational-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .motivational-body { flex: 1; }
+
+  .motivational-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
   }
 
   .motivational-text {
     font-size: 14px;
-    font-weight: 600;
-    color: var(--orange-dark);
-    font-style: italic;
+    font-weight: 500;
+    color: var(--black);
+    line-height: 1.5;
   }
 
   /* YOUTUBE LINK */
@@ -1950,8 +1970,11 @@ function renderToday() {
     </div>
 
     <div class="motivational">
-      <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Daily Motivation</div>
-      <div class="motivational-text">"${motivational}"</div>
+      <div class="motivational-icon">💬</div>
+      <div class="motivational-body">
+        <div class="motivational-label">Daily Motivation</div>
+        <div class="motivational-text">${motivational}</div>
+      </div>
     </div>
 
     <!-- MORNING SESSION -->
