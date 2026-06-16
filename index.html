@@ -1554,28 +1554,20 @@ async function handleRegister() {
   btn.disabled = true;
   btn.textContent = 'Lager konto...';
 
+  // Store name so onAuthStateChange can create the profile after session is ready
+  sessionStorage.setItem('pending_profile_name', name);
+
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
     btn.disabled = false;
     btn.textContent = 'Lag konto';
+    sessionStorage.removeItem('pending_profile_name');
     showAuthError('register', error.message || 'Noe gikk galt. Prøv igjen.');
     return;
   }
 
-  if (data.user) {
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({ id: data.user.id, name: name });
-
-    if (profileError) {
-      btn.disabled = false;
-      btn.textContent = 'Lag konto';
-      showAuthError('register', 'Konto laget, men profil feilet. Prøv å logge inn.');
-      return;
-    }
-  }
-
+  // onAuthStateChange will fire and handle profile creation + showApp
   btn.disabled = false;
   btn.textContent = 'Lag konto';
 }
@@ -1616,13 +1608,22 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     currentUser = session.user;
 
-    const { data: profile } = await supabase
+    let { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', currentUser.id)
       .single();
-    userProfile = profile;
 
+    // If no profile yet, create it (handles post-signup flow)
+    if (!profile) {
+      const pendingName = sessionStorage.getItem('pending_profile_name') || currentUser.email.split('@')[0];
+      sessionStorage.removeItem('pending_profile_name');
+      await supabase.from('profiles').insert({ id: currentUser.id, name: pendingName });
+      const { data: newProfile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+      profile = newProfile;
+    }
+
+    userProfile = profile;
     await loadProgress();
     showApp();
   } else {
